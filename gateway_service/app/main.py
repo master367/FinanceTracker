@@ -62,8 +62,8 @@ class _State:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    # timeout: 60 s total; follow redirects from upstreams
-    _State.client = httpx.AsyncClient(timeout=60.0, follow_redirects=True)
+    # timeout: 300 s total (increased for slow OCR tasks); follow redirects from upstreams
+    _State.client = httpx.AsyncClient(timeout=300.0, follow_redirects=True)
     try:
         yield
     finally:
