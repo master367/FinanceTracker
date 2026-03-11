@@ -1,50 +1,88 @@
-## Personal Finance Tracker API
+# Personal Finance Tracker
 
-Simple FastAPI application for managing personal finance transactions using PostgreSQL and SQLModel.
+Многофункциональное микросервисное приложение для учета личных финансов. Проект объединяет базовое управление транзакциями, продвинутую аналитику и автоматическое распознавание чеков с помощью искусственного интеллекта (Gemini).
 
-### Stack
+## 🌟 Основные возможности
 
-- **FastAPI**
-- **SQLModel** (models and DB)
-- **PostgreSQL**
-- **Pydantic v2**
+- **Управление транзакциями (Finance Service):**
+  - Добавление, просмотр, редактирование и удаление доходов и расходов.
+  - Поддержка категорий и тегов.
+  - Расчет базовой статистики (доходы, расходы, баланс за месяц).
 
-### Installation
+- **Продвинутая аналитика (Analytics Service):**
+  - Отрисовка круговых диаграмм расходов (Chart API).
+  - Генерация подробных PDF-отчетов.
+  - Прогнозирование будущих расходов на основе истории транзакций.
 
+- **Умное распознавание чеков (OCR Service):**
+  - Загрузка фотографий чеков.
+  - Автоматическое извлечение суммы, категории и даты с использованием **Google Gemini AI**.
+  - Прямое сохранение распознанных данных в базу.
+
+- **Единая точка входа (API Gateway):**
+  - Прозрачный реверс-прокси серверов на базе FastAPI и HTTPX.
+  - Маршрутизация всех запросов от клиента (`/api/v1/...`) к нужным микросервисам.
+
+- **Современный веб-интерфейс (Frontend):**
+  - Разработан на React (с использованием Vite).
+  - Удобный SPA (Single Page Application) интерфейс взаимодействия с API.
+
+## 🏗 Архитектура
+
+Проект состоит из 6 основных Docker-контейнеров:
+1. **db** – База данных (PostgreSQL 16).
+2. **finance-api** – Основной CRUD API (FastAPI, SQLModel/SQLAlchemy).
+3. **analytics-api** – Сервис аналитики (генерация PDF, графиков).
+4. **ocr-api** – Сервис распознавания чеков (FastAPI + Gemini).
+5. **api-gateway** – Маршрутизатор запросов на порту `8080`.
+6. **frontend** – Клиентское приложение на React (порт `5173`).
+
+## 🚀 Запуск проекта
+
+### 1. Настройка окружения
+Скопируйте пример файла конфигурации:
 ```bash
-python -m venv .venv
-.venv\Scripts\activate  # On Windows
-pip install -r requirements.txt
+cp .env.example .env
+```
+Затем откройте `.env` и укажите ваш API ключ от Google Gemini:
+```env
+GEMINI_API_KEY=ваш_секретный_ключ
+```
+(Остальные параметры, такие как пароль базы данных, можно оставить по умолчанию для локальной разработки).
+
+### 2. Запуск через Docker Compose
+Убедитесь, что у вас установлен Docker и Docker Compose.
+Выполните команду в корневой папке проекта:
+```bash
+docker-compose up -d --build
 ```
 
-### Configure PostgreSQL
+### 3. Доступ к приложению
+- **Frontend (Веб-интерфейс):** [http://localhost:5173](http://localhost:5173)
+- **API Gateway (Swagger UI):** [http://localhost:8080/docs](http://localhost:8080/docs) (Доступ к эндпоинтам всех сервисов через префиксы).
 
-Create database, for example (Windows with `psql`):
+## 📡 Основные API Эндпоинты (через Gateway)
 
-```bash
-createdb finances
-```
+Взаимодействие с бэкендом происходит через **API Gateway (`http://localhost:8080`)**:
 
-Set connection string (or use default from `database.py`):
+### 💰 Финансы (`/api/v1/finance`)
+- `GET /api/v1/finance/transactions` – Получить список транзакций (с фильтрацией по датам, категории, тегам).
+- `POST /api/v1/finance/transactions` – Добавить новую транзакцию.
+- `GET /api/v1/finance/transactions/{id}` – Получить транзакцию.
+- `PUT /api/v1/finance/transactions/{id}` – Обновить транзакцию.
+- `DELETE /api/v1/finance/transactions/{id}` – Удалить транзакцию.
+- `GET /api/v1/finance/stats` – Получить базовую статистику за месяц.
 
-```bash
-set DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/finances
-```
+### 📊 Аналитика (`/api/v1/analytics`)
+- `POST /api/v1/analytics/api/analytics/pdf` – Сгенерировать PDF-отчет по списку транзакций.
+- `POST /api/v1/analytics/api/analytics/chart` – Сгенерировать график (PNG) по расходам.
+- `POST /api/v1/analytics/api/analytics/forecast` – Получить прогноз расходов на следующий месяц.
 
-### Running
+### 🧾 Распознавание (`/api/v1/ocr`)
+- `POST /api/v1/ocr/scan` – Отправить изображение чека (чтение через Gemini и создание транзакции).
 
-```bash
-uvicorn main:app --reload
-```
-
-Open interactive docs at `http://127.0.0.1:8000/docs`.
-
-### Main Endpoints
-
-- **POST** `/transactions` – create transaction
-- **GET** `/transactions` – list with filters (date range, category, tags)
-- **GET** `/transactions/{id}` – get single transaction
-- **PUT** `/transactions/{id}` – update transaction
-- **DELETE** `/transactions/{id}` – delete transaction
-- **GET** `/stats` – monthly income/expense/balance statistics (`year`, `month` query params)
-
+## 🛠 Технологический стек
+- **Backend:** Python 3, FastAPI, SQLModel, PostgreSQL, HTTPX.
+- **Frontend:** React, Vite, TypeScript.
+- **AI/ML:** Google Gemini API.
+- **Инфраструктура:** Docker, Docker Compose.
