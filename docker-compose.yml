@@ -1,0 +1,106 @@
+version: "3.9"
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  db-data:
+
+
+services:
+  db:
+    image: postgres:16
+    container_name: finance-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-net
+
+  finance-api:
+    build:
+      context: ./finance_service
+      dockerfile: Dockerfile
+    container_name: finance-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    # No host ports — reachable only via Docker network by api-gateway
+    expose:
+      - "8000"
+    networks:
+      - microservices-net
+
+  analytics-api:
+    build:
+      context: ./analytics_service
+      dockerfile: Dockerfile
+    container_name: analytics-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    # No host ports — reachable only via Docker network by api-gateway
+    expose:
+      - "8000"
+    networks:
+      - microservices-net
+
+  ocr-api:
+    build:
+      context: ./ocr_service
+      dockerfile: Dockerfile
+    container_name: ocr-api
+    restart: unless-stopped
+    expose:
+      - "8000"
+    env_file:
+      - .env
+    depends_on:
+      - finance-api
+    networks:
+      - microservices-net
+
+  api-gateway:
+    build:
+      context: ./gateway_service
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - finance-api
+      - analytics-api
+      - ocr-api
+    ports:
+      - "8080:8000"
+    networks:
+      - microservices-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: finance-frontend
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    ports:
+      - "5173:80"
+    networks:
+      - microservices-net
