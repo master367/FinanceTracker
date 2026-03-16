@@ -99,119 +99,120 @@ export const AnalyticsPage: React.FC = () => {
   return (
     <div className="page-wrapper">
       <Header />
-      <div className="app">
-        {/* Summary card */}
-        <div className="card analytics-summary-card">
-          <h2 className="analytics-section-title">📊 Обзор данных</h2>
-          {txLoading && <p className="analytics-loading">Загрузка транзакций…</p>}
-          {txError && <div className="error-banner">{txError}</div>}
-          {!txLoading && !txError && (
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-label">Транзакций</div>
-                <div className="stat-value">{transactions.length}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Доходы</div>
-                <div className="stat-value income">+{totalIncome.toLocaleString("ru-RU", { maximumFractionDigits: 2 })}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Расходы</div>
-                <div className="stat-value expense">−{totalExpense.toLocaleString("ru-RU", { maximumFractionDigits: 2 })}</div>
-              </div>
+      <main className="analytics-layout">
+        <div className="hero-glow" style={{ opacity: 0.1 }} />
+        
+        {/* Block 1 — Overview stats */}
+        <div className="grid-3-col" style={{ marginBottom: '32px' }}>
+          <div className="card" style={{ padding: '24px', textAlign: 'center' }}>
+            <div className="text-label">Транзакций</div>
+            <div style={{ fontSize: '28px', fontWeight: 700 }}>{transactions.length}</div>
+          </div>
+          <div className="card" style={{ padding: '24px', textAlign: 'center' }}>
+            <div className="text-label">Доходы</div>
+            <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--accent-green)' }}>
+              +{totalIncome.toLocaleString("ru-RU")} ₸
             </div>
-          )}
+          </div>
+          <div className="card" style={{ padding: '24px', textAlign: 'center' }}>
+            <div className="text-label">Расходы</div>
+            <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--danger-red)' }}>
+              −{totalExpense.toLocaleString("ru-RU")} ₸
+            </div>
+          </div>
         </div>
 
-        {/* Actions */}
-        <div className="analytics-actions">
-          {/* PDF */}
-          <div className="analytics-action-card">
-            <div className="analytics-action-icon">📄</div>
-            <h3>PDF-отчёт</h3>
-            <p>Таблица всех транзакций с итогами доходов и расходов</p>
-            {pdfError && <div className="error-banner">{pdfError}</div>}
+        {/* Block 2 — Analytics grid */}
+        <div className="grid-2x2">
+          {/* Card 1 — PDF report */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ fontSize: '32px' }}>📄</div>
+            <h2 className="card-title" style={{ margin: 0 }}>PDF-отчёт</h2>
+            <div className="text-secondary" style={{ fontSize: '13px', flex: 1 }}>
+              Полная выписка по всем операциям в формате PDF.
+            </div>
             <button
-              type="button"
-              className="btn primary"
+              className="btn btn-blue"
               onClick={handlePdf}
               disabled={pdfState === "loading" || txLoading || transactions.length === 0}
             >
-              {pdfState === "loading" ? "Генерация…" : "Скачать PDF-отчёт"}
+              {pdfState === "loading" ? "Загрузка..." : "Скачать отчёт"}
             </button>
           </div>
 
-          {/* Chart */}
-          <div className="analytics-action-card">
-            <div className="analytics-action-icon">🥧</div>
-            <h3>Диаграмма расходов</h3>
-            <p>Круговая диаграмма расходов по категориям</p>
-            {chartError && <div className="error-banner">{chartError}</div>}
-            <button
-              type="button"
-              className="btn primary"
+          {/* Card 2 — Expense chart */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ fontSize: '32px' }}>🥧</div>
+            <h2 className="card-title" style={{ margin: 0 }}>Диаграмма расходов</h2>
+            
+            <div className="analytics-chart-wrapper">
+              {chartUrl ? (
+                <img src={chartUrl} alt="Expense chart" className="analytics-chart" />
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: '12px', textAlign: 'center' }}>
+                  Нажмите кнопку для анализа категорий
+                </div>
+              )}
+            </div>
+
+            <button 
+              className="btn btn-secondary" 
               onClick={handleChart}
-              disabled={chartState === "loading" || txLoading || transactions.length === 0}
+              disabled={chartState === "loading" || transactions.length === 0}
             >
-              {chartState === "loading" ? "Генерация…" : "Показать диаграмму"}
+              {chartState === "loading" ? "Генерация..." : "Построить график"}
             </button>
-            {chartUrl && (
-              <div className="analytics-chart-wrapper">
-                <img src={chartUrl} alt="Expense pie chart" className="analytics-chart" />
-              </div>
-            )}
           </div>
 
-          {/* Forecast */}
-          <div className="analytics-action-card">
-            <div className="analytics-action-icon">🔮</div>
-            <h3>Прогноз на месяц</h3>
-            <p>Расчёт средних дневных расходов и прогноз на 30 дней</p>
-            {forecastError && <div className="error-banner">{forecastError}</div>}
-            <button
-              type="button"
-              className="btn primary"
-              onClick={handleForecast}
-              disabled={forecastState === "loading" || txLoading || transactions.length === 0}
-            >
-              {forecastState === "loading" ? "Расчёт…" : "Прогноз на месяц"}
-            </button>
-            {forecast && (
-              <div className="forecast-card">
-                {forecast.message && (
-                  <p className="forecast-message">{forecast.message}</p>
-                )}
-                <div className="forecast-grid">
-                  <div className="forecast-item">
-                    <span className="forecast-label">Прогноз (30 дн.)</span>
-                    <span className="forecast-value forecast-main">
-                      {forecast.forecast_30d.toLocaleString("ru-RU", { maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="forecast-item">
-                    <span className="forecast-label">Среднее / день</span>
-                    <span className="forecast-value">
-                      {forecast.avg_daily.toLocaleString("ru-RU", { maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="forecast-item">
-                    <span className="forecast-label">Дней в данных</span>
-                    <span className="forecast-value">{forecast.data_days}</span>
-                  </div>
-                  {forecast.total_spent !== undefined && (
-                    <div className="forecast-item">
-                      <span className="forecast-label">Потрачено всего</span>
-                      <span className="forecast-value">
-                        {forecast.total_spent.toLocaleString("ru-RU", { maximumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                  )}
+          {/* Card 3 — Monthly forecast */}
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px', gridColumn: 'span 2' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ fontSize: '32px' }}>🔮</div>
+              <div>
+                <h2 className="card-title" style={{ margin: 0 }}>ИИ-Прогноз на месяц</h2>
+                <div className="text-muted" style={{ fontSize: '12px' }}>На основе истории ваших трат</div>
+              </div>
+            </div>
+            
+            <div className="grid-4-col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '16px' }}>
+              <div>
+                <div className="text-label" style={{ fontSize: '10px' }}>Прогноз (30 дн.)</div>
+                <div style={{ color: 'var(--accent-blue)', fontWeight: 700, fontSize: '20px' }}>
+                  {forecast?.forecast_30d.toLocaleString("ru-RU", { maximumFractionDigits: 0 }) ?? '0'} ₸
                 </div>
               </div>
-            )}
+              <div>
+                <div className="text-label" style={{ fontSize: '10px' }}>В день</div>
+                <div style={{ fontWeight: 600, fontSize: '18px' }}>
+                  {forecast?.avg_daily.toLocaleString("ru-RU", { maximumFractionDigits: 0 }) ?? '0'} ₸
+                </div>
+              </div>
+              <div>
+                <div className="text-label" style={{ fontSize: '10px' }}>Дней данных</div>
+                <div style={{ fontWeight: 600, fontSize: '18px' }}>{forecast?.data_days ?? '0'}</div>
+              </div>
+              <div>
+                <div className="text-label" style={{ fontSize: '10px' }}>Всего трат</div>
+                <div style={{ fontWeight: 600, fontSize: '18px' }}>
+                  {forecast?.total_spent?.toLocaleString("ru-RU", { maximumFractionDigits: 0 }) ?? '0'} ₸
+                </div>
+              </div>
+            </div>
+
+            <button 
+              className="btn btn-primary" 
+              onClick={handleForecast} 
+              disabled={forecastState === "loading" || transactions.length === 0}
+            >
+              {forecastState === "loading" ? "Расчёт..." : "Обновить ИИ-прогноз"}
+            </button>
           </div>
         </div>
-      </div>
+
+        <div style={{ textAlign: 'center', marginTop: '48px', color: 'var(--text-muted)', fontSize: '13px', opacity: 0.5 }}>
+          Точность прогноза улучшается пропорционально количеству ваших транзакций
+        </div>
+      </main>
     </div>
   );
 };

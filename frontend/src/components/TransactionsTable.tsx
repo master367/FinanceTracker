@@ -21,22 +21,20 @@ export const TransactionsTable: React.FC<Props> = ({
   }
 
   const formatAmount = (t: Transaction) => {
-    const sign = t.type === "income" ? "+" : "-";
-    return `${sign}${t.amount.toFixed(2)}`;
+    const formatted = t.amount.toLocaleString("ru-RU");
+    return `${formatted} ₸`;
   };
 
   const formatDateTime = (iso: string) =>
-    new Date(iso).toLocaleString("ru-RU", {
-      year: "2-digit",
+    new Date(iso).toLocaleDateString("ru-RU", {
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
     });
 
   return (
-    <div className="table-wrapper">
-      <table className="table">
+    <div className="table-container">
+      <table>
         <thead>
           <tr>
             <th>Дата</th>
@@ -44,18 +42,18 @@ export const TransactionsTable: React.FC<Props> = ({
             <th>Категория</th>
             <th>Описание</th>
             <th>Теги</th>
-            <th className="amount-col">Сумма</th>
+            <th style={{ textAlign: 'right' }}>Сумма</th>
             <th />
           </tr>
         </thead>
         <tbody>
           {transactions.map((t) => (
             <tr key={t.id}>
-              <td>{formatDateTime(t.created_at)}</td>
+              <td style={{ color: 'var(--text-secondary)' }}>{formatDateTime(t.created_at)}</td>
               <td>
                 <span
                   className={
-                    t.type === "income" ? "pill pill-income" : "pill pill-expense"
+                    t.type === "income" ? "badge badge-income" : "badge badge-expense"
                   }
                 >
                   {t.type === "income" ? "Доход" : "Расход"}
@@ -64,22 +62,17 @@ export const TransactionsTable: React.FC<Props> = ({
               <td>{t.category || "—"}</td>
               <td>{t.description || "—"}</td>
               <td>{t.tags || "—"}</td>
-              <td className="amount-col">
-                <span
-                  className={
-                    t.type === "income" ? "amount amount-income" : "amount amount-expense"
-                  }
-                >
-                  {formatAmount(t)}
-                </span>
+              <td className={`amount ${t.type === "income" ? 'amount-income' : 'amount-expense'}`}>
+                {formatAmount(t)}
               </td>
-              <td className="actions-col">
+              <td style={{ textAlign: 'right' }}>
                 <button
                   type="button"
-                  className="btn danger small"
+                  className="btn-secondary"
+                  style={{ width: '24px', height: '24px', padding: 0, fontSize: '10px', borderRadius: '4px', cursor: 'pointer', color: 'var(--danger-red)' }}
                   onClick={() => onDelete(t.id)}
                 >
-                  Удалить
+                  ✕
                 </button>
               </td>
             </tr>

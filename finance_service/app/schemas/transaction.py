@@ -1,18 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from pydantic import BaseModel, Field
+
+from app.models.transaction import TransactionType
 
 
-class TransactionType(str, Enum):
-    INCOME = "income"
-    EXPENSE = "expense"
-
-
-class TransactionBase(SQLModel):
+class TransactionBase(BaseModel):
     amount: float = Field(ge=0, description="Transaction amount, cannot be negative")
     description: Optional[str] = Field(default=None, max_length=255)
     type: TransactionType = Field(description="income or expense")
@@ -21,17 +17,8 @@ class TransactionBase(SQLModel):
     tags: Optional[str] = Field(default=None, max_length=255)
 
 
-class Transaction(TransactionBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    created_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        nullable=False,
-        index=True,
-    )
-
-
 class TransactionCreate(TransactionBase):
-    ...
+    pass
 
 
 class TransactionRead(TransactionBase):
@@ -41,9 +28,17 @@ class TransactionRead(TransactionBase):
     model_config = {"from_attributes": True}
 
 
-class TransactionUpdate(SQLModel):
+class TransactionUpdate(BaseModel):
     amount: Optional[float] = Field(default=None, ge=0)
     description: Optional[str] = Field(default=None, max_length=255)
     type: Optional[TransactionType] = None
     category: Optional[str] = Field(default=None, max_length=100)
     tags: Optional[str] = Field(default=None, max_length=255)
+
+
+class StatsResponse(BaseModel):
+    year: int
+    month: int
+    income: float
+    expense: float
+    balance: float

@@ -28,57 +28,53 @@ export const FiltersBar: React.FC<Props> = ({
   onReset,
 }) => {
   return (
-    <div className="filters">
-      <div className="filters-row">
-        <label>
-          С
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => onFromDateChange(e.target.value)}
-          />
-        </label>
-        <label>
-          По
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => onToDateChange(e.target.value)}
-          />
-        </label>
-        <label>
-          Категория
-          <select
-            value={category}
-            onChange={(e) => onCategoryChange(e.target.value)}
-          >
-            <option value="">Все</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex-grow">
-          Теги
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => onTagsChange(e.target.value)}
-            placeholder="food,travel"
-          />
-        </label>
+    <>
+    <div className="filters-row-flex">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>С:</span>
+        <input
+          type="date"
+          style={{ width: '130px' }}
+          value={fromDate}
+          onChange={(e) => onFromDateChange(e.target.value)}
+        />
       </div>
-      <div className="filters-actions">
-        <button type="button" className="btn secondary" onClick={onReset}>
-          Сбросить
-        </button>
-        <button type="button" className="btn primary" onClick={onApply}>
-          Применить
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>По:</span>
+        <input
+          type="date"
+          style={{ width: '130px' }}
+          value={toDate}
+          onChange={(e) => onToDateChange(e.target.value)}
+        />
       </div>
+      <select
+        style={{ width: '150px' }}
+        value={category}
+        onChange={(e) => onCategoryChange(e.target.value)}
+      >
+        <option value="">Категория</option>
+        {categories.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </select>
+      <input
+        type="text"
+        style={{ width: '150px' }}
+        value={tags}
+        onChange={(e) => onTagsChange(e.target.value)}
+        placeholder="Теги"
+      />
+      <button type="button" className="btn btn-secondary" style={{ fontSize: '13px', padding: '0 16px', height: '42px', width: 'auto' }} onClick={onReset}>
+        Сбросить
+      </button>
+      <button type="button" className="btn btn-blue" style={{ fontSize: '13px', padding: '0 16px', height: '42px', width: 'auto' }} onClick={onApply}>
+        Применить
+      </button>
     </div>
+    </>
   );
 };
 

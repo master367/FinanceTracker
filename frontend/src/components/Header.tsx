@@ -4,10 +4,10 @@ import { NavLink } from "react-router-dom";
 export const Header: React.FC = () => {
   return (
     <header className="nav-header">
-      <div className="nav-logo">
+      <NavLink to="/" className="nav-logo">
         <span className="nav-logo-icon">💰</span>
         <span className="nav-logo-text">FinanceTracker</span>
-      </div>
+      </NavLink>
       <nav className="nav-links">
         <NavLink
           to="/"

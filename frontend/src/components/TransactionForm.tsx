@@ -43,84 +43,55 @@ export const TransactionForm: React.FC<Props> = ({ onSubmit, defaultType }) => {
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <div className="form-row">
-        <label>
-          Сумма
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
-        </label>
+      <div className="grid-2x2" style={{ marginBottom: '8px' }}>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="0.00 ₸"
+          required
+        />
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value as TransactionType)}
+        >
+          <option value="expense">Расход</option>
+          <option value="income">Доход</option>
+        </select>
       </div>
-      <div className="form-row">
-        <label>
-          Тип
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                name="type"
-                value="expense"
-                checked={type === "expense"}
-                onChange={() => setType("expense")}
-              />
-              Расход
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="type"
-                value="income"
-                checked={type === "income"}
-                onChange={() => setType("income")}
-              />
-              Доход
-            </label>
-          </div>
-        </label>
+
+      <div style={{ marginBottom: '8px' }}>
+        <input
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="Категория (Продукты, транспорт...)"
+        />
       </div>
-      <div className="form-row">
-        <label>
-          Категория
-          <input
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="Например: продукты, зарплата"
-          />
-        </label>
+
+      <div style={{ marginBottom: '8px' }}>
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Описание (Краткий комментарий)"
+        />
       </div>
-      <div className="form-row">
-        <label>
-          Описание
-          <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Краткий комментарий"
-          />
-        </label>
+
+      <div style={{ marginBottom: '12px' }}>
+        <input
+          type="text"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          placeholder="Теги (еда, дом, машина)"
+        />
       </div>
-      <div className="form-row">
-        <label>
-          Теги
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="Через запятую: дом,машина"
-          />
-        </label>
-      </div>
-      <div className="form-row">
-        <button type="submit" className="btn primary" disabled={submitting}>
-          {submitting ? "Сохранение..." : "Добавить"}
-        </button>
-      </div>
+
+      <button type="submit" className="btn btn-primary" disabled={submitting}>
+        {submitting ? "..." : "＋ Добавить"}
+      </button>
     </form>
   );
 };

@@ -44,57 +44,48 @@ export const StatsPanel: React.FC<Props> = ({
 
   return (
     <div className="stats">
-      <div className="stats-filters">
-        <label>
-          Месяц
-          <select
-            value={month}
-            onChange={(e) => onMonthChange(Number(e.target.value))}
-          >
-            {MONTH_LABELS.map((label, index) => (
-              <option key={label} value={index + 1}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Год
-          <select
-            value={year}
-            onChange={(e) => onYearChange(Number(e.target.value))}
-          >
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button type="button" className="btn secondary" onClick={onRefresh}>
-          Обновить
-        </button>
+      <div className="form-row" style={{ gap: '6px', marginBottom: '12px' }}>
+        <select
+          value={month}
+          onChange={(e) => onMonthChange(Number(e.target.value))}
+        >
+          {MONTH_LABELS.map((label, index) => (
+            <option key={label} value={index + 1}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={year}
+          onChange={(e) => onYearChange(Number(e.target.value))}
+        >
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {loading && <div>Загрузка...</div>}
+      {loading && <div className="text-muted">Загрузка...</div>}
       {!loading && stats && (
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-label">Доходы</div>
-            <div className="stat-value income">
-              {stats.income.toFixed(2)}
+        <div className="grid-3-col" style={{ background: 'var(--bg-color)', borderRadius: '8px', padding: '10px 12px' }}>
+          <div className="stat-item">
+            <div className="text-label" style={{ fontSize: '11px', marginBottom: '2px' }}>Доходы</div>
+            <div className="amount-income" style={{ fontSize: '14px', fontWeight: 500 }}>
+              {stats.income.toLocaleString("ru-RU")} ₸
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-label">Расходы</div>
-            <div className="stat-value expense">
-              {stats.expense.toFixed(2)}
+          <div className="stat-item">
+            <div className="text-label" style={{ fontSize: '11px', marginBottom: '2px' }}>Расходы</div>
+            <div className="amount-expense" style={{ fontSize: '14px', fontWeight: 500 }}>
+              {stats.expense.toLocaleString("ru-RU")} ₸
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-label">Баланс</div>
-            <div className="stat-value">
-              {stats.balance.toFixed(2)}
+          <div className="stat-item">
+            <div className="text-label" style={{ fontSize: '11px', marginBottom: '2px' }}>Баланс</div>
+            <div className="text-primary" style={{ fontSize: '14px', fontWeight: 500 }}>
+              {stats.balance.toLocaleString("ru-RU")} ₸
             </div>
           </div>
         </div>

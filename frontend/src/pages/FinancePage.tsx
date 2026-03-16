@@ -141,102 +141,142 @@ export const FinancePage: React.FC = () => {
   return (
     <div className="page-wrapper">
       <Header />
-      <div className="app">
-        <main className="layout">
-          <section className="left-column">
-            <div className="card">
-              <h2>Новая транзакция</h2>
-              <TransactionForm
-                onSubmit={handleCreate}
-                defaultType={"expense" satisfies TransactionType}
-              />
-            </div>
+      <div className="finance-page-container">
+        <div className="hero-glow" />
+        
+        {/* LEFT COLUMN */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Card 1 — New transaction form */}
+          <div className="card" style={{ marginBottom: 0 }}>
+            <h2 className="card-title">Новая операция</h2>
+            <TransactionForm
+              onSubmit={handleCreate}
+              defaultType={"expense" satisfies TransactionType}
+            />
+          </div>
 
-            <div className="card">
-              <h2>Статистика за месяц</h2>
-              <StatsPanel
-                stats={stats}
-                loading={statsLoading}
-                year={statsYear}
-                month={statsMonth}
-                onYearChange={setStatsYear}
-                onMonthChange={setStatsMonth}
-                onRefresh={loadStats}
-              />
-            </div>
-
-            <div className="card">
-              <h2>📷 Сканировать чек</h2>
-              <div className="ocr-card">
-                <label className="ocr-dropzone" htmlFor="ocr-file-input">
-                  {ocrFile
-                    ? <span className="ocr-file-name">📄 {ocrFile.name}</span>
-                    : <span className="ocr-placeholder">Выберите или перетащите фото чека</span>
-                  }
-                  <input
-                    id="ocr-file-input"
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={(e) => {
-                      setOcrFile(e.target.files?.[0] ?? null);
-                      setOcrSuccess(null);
-                      setOcrError(null);
-                    }}
-                  />
-                </label>
-
-                <button
-                  type="button"
-                  className="btn primary"
-                  onClick={handleOcrScan}
-                  disabled={!ocrFile || ocrLoading}
-                >
-                  {ocrLoading ? "🧠 Нейросеть изучает чек…" : "Распознать чек"}
-                </button>
-
-                {ocrSuccess && <div className="ocr-success">{ocrSuccess}</div>}
-                {ocrError   && <div className="error-banner">{ocrError}</div>}
-              </div>
-            </div>
-          </section>
-
-          <section className="right-column">
-            <div className="card">
-              <div className="card-header-row">
-                <h2>Транзакции</h2>
-                <button type="button" className="btn secondary" onClick={loadTransactions}>
-                  Обновить
-                </button>
-              </div>
-              <FiltersBar
-                fromDate={fromDate}
-                toDate={toDate}
-                category={category}
-                tags={tags}
-                categories={uniqueCategories}
-                onFromDateChange={setFromDate}
-                onToDateChange={setToDate}
-                onCategoryChange={setCategory}
-                onTagsChange={setTags}
-                onApply={loadTransactions}
-                onReset={() => {
-                  setFromDate("");
-                  setToDate("");
-                  setCategory("");
-                  setTags("");
-                  void loadTransactions();
+          {/* Card 2 — OCR scanner */}
+          <div className="card" style={{ marginBottom: 0 }}>
+            <h2 className="card-title">🧾 Сканировать чек</h2>
+            <div className="ocr-card">
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '120px',
+                  border: '2px dashed var(--card-border)',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  backgroundColor: 'rgba(255,255,255,0.02)',
+                  transition: 'background 0.3s'
                 }}
-              />
-              {error && <div className="error-banner">{error}</div>}
-              <TransactionsTable
-                transactions={transactions}
-                loading={loading}
-                onDelete={handleDelete}
-              />
+                htmlFor="ocr-file-input"
+              >
+                <div style={{ fontSize: '24px', marginBottom: '4px' }}>📸</div>
+                {ocrFile ? (
+                  <span style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600 }}>{ocrFile.name}</span>
+                ) : (
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Нажмите для выбора фото</span>
+                )}
+                <input
+                  id="ocr-file-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    setOcrFile(e.target.files?.[0] ?? null);
+                    setOcrSuccess(null);
+                    setOcrError(null);
+                  }}
+                />
+              </label>
+
+              <button
+                type="button"
+                className="btn btn-blue"
+                style={{ marginTop: '12px' }}
+                onClick={handleOcrScan}
+                disabled={!ocrFile || ocrLoading}
+              >
+                {ocrLoading ? "..." : "Распознать и сохранить"}
+              </button>
+
+              {ocrSuccess && <div className="badge badge-income" style={{ marginTop: '8px', padding: '8px', textAlign: 'center', width: '100%' }}>{ocrSuccess}</div>}
+              {ocrError && <div className="error-banner" style={{ marginTop: '8px' }}>{ocrError}</div>}
             </div>
-          </section>
-        </main>
+          </div>
+
+          {/* Card 3 — Monthly stats */}
+          <div className="card" style={{ marginBottom: 0 }}>
+            <h2 className="card-title">Статистика</h2>
+            <StatsPanel
+              stats={stats}
+              loading={statsLoading}
+              year={statsYear}
+              month={statsMonth}
+              onYearChange={setStatsYear}
+              onMonthChange={setStatsMonth}
+              onRefresh={loadStats}
+            />
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN — Transactions table */}
+        <div style={{ height: '100%' }}>
+          <div className="card" style={{ minHeight: '100%', marginBottom: 0, padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2 className="card-title" style={{ margin: 0, fontSize: '18px' }}>История операций</h2>
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ fontSize: '12px', padding: '6px 12px', cursor: 'pointer', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}
+                onClick={loadTransactions}
+              >
+                Обновить
+              </button>
+            </div>
+
+            <FiltersBar
+              fromDate={fromDate}
+              toDate={toDate}
+              category={category}
+              tags={tags}
+              categories={uniqueCategories}
+              onFromDateChange={setFromDate}
+              onToDateChange={setToDate}
+              onCategoryChange={setCategory}
+              onTagsChange={setTags}
+              onApply={loadTransactions}
+              onReset={() => {
+                setFromDate("");
+                setToDate("");
+                setCategory("");
+                setTags("");
+                void loadTransactions();
+              }}
+            />
+
+            <div style={{ borderBottom: '1px solid var(--card-border)', margin: '20px 0' }} />
+
+            {transactions.some(t => !t.category) && (
+              <div className="alert-banner">
+                <span>💡</span>
+                <span>Добавьте категории к операциям — это сделает ИИ-аналитику более точной.</span>
+              </div>
+            )}
+
+            {error && <div className="error-banner">{error}</div>}
+            <TransactionsTable
+              transactions={transactions}
+              loading={loading}
+              onDelete={handleDelete}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
