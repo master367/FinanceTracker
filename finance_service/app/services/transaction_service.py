@@ -44,7 +44,7 @@ class TransactionService:
         expense_sum = self.repository.get_stats_by_month(year, month, TransactionType.EXPENSE)
         
         balance = income_sum - expense_sum
-        return dict(
+        return StatsResponse(
             year=year,
             month=month,
             income=income_sum,
